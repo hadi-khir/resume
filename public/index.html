@@ -67,6 +67,9 @@
       <!-- Resume selector -->
       <div class="resume-selector" id="resumeSelector">
         <select id="resumeSelect" class="resume-select"></select>
+        <button class="btn btn-small" id="renameResumeBtn" title="Rename Resume">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M11 2l3 3-8 8H3v-3l8-8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        </button>
         <button class="btn btn-small" id="newResumeBtn" title="New Resume">+</button>
         <button class="btn btn-small btn-danger-small" id="deleteResumeBtn" title="Delete Resume">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -123,6 +126,47 @@
       </div>
     </section>
   </main>
+
+  <!-- New Resume Modal -->
+  <div class="modal-overlay hidden" id="newResumeModal">
+    <div class="modal-card">
+      <h3 class="modal-title">New Resume</h3>
+      <div class="modal-field">
+        <label for="newResumeName">Resume Name</label>
+        <input type="text" class="field-input" id="newResumeName" placeholder="My Resume">
+      </div>
+      <div class="modal-field">
+        <label>Start from</label>
+        <div class="modal-radio-group">
+          <label><input type="radio" name="newResumeType" value="scratch" checked> Start from scratch</label>
+          <label><input type="radio" name="newResumeType" value="clone"> Clone existing resume</label>
+        </div>
+      </div>
+      <div class="modal-field hidden" id="cloneSourceField">
+        <label for="cloneSourceSelect">Resume to clone</label>
+        <select class="resume-select" id="cloneSourceSelect" style="width:100%"></select>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="newResumeCancel">Cancel</button>
+        <button class="btn btn-primary" id="newResumeConfirm">Create</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rename Resume Modal -->
+  <div class="modal-overlay hidden" id="renameResumeModal">
+    <div class="modal-card">
+      <h3 class="modal-title">Rename Resume</h3>
+      <div class="modal-field">
+        <label for="renameResumeInput">Resume Name</label>
+        <input type="text" class="field-input" id="renameResumeInput" placeholder="My Resume">
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary" id="renameResumeCancel">Cancel</button>
+        <button class="btn btn-primary" id="renameResumeConfirm">Save</button>
+      </div>
+    </div>
+  </div>
 
   <!-- Print-only resume -->
   <div class="print-only" id="printContainer"></div>

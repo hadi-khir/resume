@@ -40,6 +40,37 @@ function emptyResumeData() {
   };
 }
 
+function defaultResumeData() {
+  return {
+    personal: { firstName: '', lastName: '', title: '', email: '', phone: '', location: '', linkedin: '', website: '' },
+    summary: 'Results-driven professional with experience delivering impactful work in a collaborative environment. Proven ability to [key skill or achievement]. Passionate about [area of focus] and committed to continuous growth.',
+    experience: [
+      {
+        position: 'Job Title',
+        company: 'Company Name',
+        location: 'City, State',
+        startDate: '',
+        endDate: '',
+        current: true,
+        description: 'Led key initiatives that delivered measurable business outcomes\nCollaborated cross-functionally with stakeholders to achieve goals\nIdentified and resolved inefficiencies, improving team productivity'
+      }
+    ],
+    education: [
+      {
+        institution: 'University Name',
+        degree: 'Bachelor of Science',
+        field: 'Your Field',
+        startDate: '2018',
+        endDate: '2022',
+        gpa: ''
+      }
+    ],
+    skills: ['Communication', 'Problem Solving', 'Collaboration', 'Adaptability'],
+    projects: [],
+    certifications: []
+  };
+}
+
 // ── Section Definitions ────────────────────
 var SECTIONS = [
   { id: 'personal', title: 'Personal Info', icon: 'U' },
@@ -771,16 +802,66 @@ function initEvents() {
     renderPreview();
   });
 
-  document.getElementById('newResumeBtn').addEventListener('click', async function() {
-    var name = prompt('Resume name:', 'New Resume');
+  document.getElementById('newResumeBtn').addEventListener('click', function() {
+    var nameInput = document.getElementById('newResumeName');
+    nameInput.value = 'New Resume';
+
+    var cloneSelect = document.getElementById('cloneSourceSelect');
+    cloneSelect.textContent = '';
+    state.resumeList.forEach(function(r) {
+      var opt = document.createElement('option');
+      opt.value = r.id;
+      opt.textContent = r.name;
+      cloneSelect.appendChild(opt);
+    });
+
+    document.querySelector('input[name="newResumeType"][value="scratch"]').checked = true;
+    document.getElementById('cloneSourceField').classList.add('hidden');
+
+    document.getElementById('newResumeModal').classList.remove('hidden');
+    nameInput.focus();
+    nameInput.select();
+  });
+
+  document.querySelectorAll('input[name="newResumeType"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      document.getElementById('cloneSourceField').classList.toggle('hidden', radio.value !== 'clone');
+    });
+  });
+
+  document.getElementById('newResumeCancel').addEventListener('click', function() {
+    document.getElementById('newResumeModal').classList.add('hidden');
+  });
+
+  document.getElementById('newResumeModal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.add('hidden');
+  });
+
+  document.getElementById('newResumeName').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('newResumeConfirm').click();
+    if (e.key === 'Escape') document.getElementById('newResumeModal').classList.add('hidden');
+  });
+
+  document.getElementById('newResumeConfirm').addEventListener('click', async function() {
+    var name = document.getElementById('newResumeName').value.trim();
     if (!name) return;
+    var type = document.querySelector('input[name="newResumeType"]:checked').value;
+
     try {
-      var newResume = await api('POST', '/resumes', {
-        name: name,
-        template: 'modern',
-        data: emptyResumeData()
-      });
+      var resumeData, resumeTemplate;
+      if (type === 'clone') {
+        var sourceId = parseInt(document.getElementById('cloneSourceSelect').value);
+        var source = await api('GET', '/resumes/' + sourceId);
+        resumeData = source.data;
+        resumeTemplate = source.template;
+      } else {
+        resumeData = defaultResumeData();
+        resumeTemplate = 'modern';
+      }
+
+      var newResume = await api('POST', '/resumes', { name: name, template: resumeTemplate, data: resumeData });
       state.resumeList.unshift({ id: newResume.id, name: newResume.name, template: newResume.template });
+      document.getElementById('newResumeModal').classList.add('hidden');
       renderResumeSelect();
       await loadResume(newResume.id);
       renderTemplateCards();
@@ -788,6 +869,42 @@ function initEvents() {
       renderPreview();
     } catch (err) {
       alert('Failed to create resume: ' + err.message);
+    }
+  });
+
+  document.getElementById('renameResumeBtn').addEventListener('click', function() {
+    var current = state.resumeList.find(function(r) { return r.id === state.currentResumeId; });
+    var input = document.getElementById('renameResumeInput');
+    input.value = current ? current.name : '';
+    document.getElementById('renameResumeModal').classList.remove('hidden');
+    input.focus();
+    input.select();
+  });
+
+  document.getElementById('renameResumeCancel').addEventListener('click', function() {
+    document.getElementById('renameResumeModal').classList.add('hidden');
+  });
+
+  document.getElementById('renameResumeModal').addEventListener('click', function(e) {
+    if (e.target === this) this.classList.add('hidden');
+  });
+
+  document.getElementById('renameResumeInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') document.getElementById('renameResumeConfirm').click();
+    if (e.key === 'Escape') document.getElementById('renameResumeModal').classList.add('hidden');
+  });
+
+  document.getElementById('renameResumeConfirm').addEventListener('click', async function() {
+    var name = document.getElementById('renameResumeInput').value.trim();
+    if (!name) return;
+    try {
+      await api('PUT', '/resumes/' + state.currentResumeId, { name: name, template: state.template, data: state.data });
+      var entry = state.resumeList.find(function(r) { return r.id === state.currentResumeId; });
+      if (entry) entry.name = name;
+      renderResumeSelect();
+      document.getElementById('renameResumeModal').classList.add('hidden');
+    } catch (err) {
+      alert('Failed to rename: ' + err.message);
     }
   });
 
