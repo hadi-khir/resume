@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ResumeForge — ATS-Friendly Resume Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+  <!-- Auth Modal -->
+  <div class="auth-overlay" id="authOverlay">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <svg width="36" height="36" viewBox="0 0 28 28" fill="none">
+          <rect x="2" y="2" width="24" height="24" rx="4" stroke="currentColor" stroke-width="2"/>
+          <line x1="7" y1="8" x2="21" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="7" y1="13" x2="18" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="7" y1="17" x2="20" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="7" y1="21" x2="15" y2="21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span>ResumeForge</span>
+      </div>
+      <h2 class="auth-title" id="authTitle">Sign in to your account</h2>
+      <div class="auth-error" id="authError"></div>
+      <form id="authForm" autocomplete="on">
+        <div class="auth-field" id="authNameField" style="display:none">
+          <label for="authName">Full Name</label>
+          <input type="text" id="authName" placeholder="John Doe" autocomplete="name">
+        </div>
+        <div class="auth-field">
+          <label for="authEmail">Email</label>
+          <input type="email" id="authEmail" placeholder="you@email.com" required autocomplete="email">
+        </div>
+        <div class="auth-field">
+          <label for="authPassword">Password</label>
+          <input type="password" id="authPassword" placeholder="Min 8 characters" required minlength="8" autocomplete="current-password">
+        </div>
+        <button type="submit" class="auth-submit" id="authSubmit">Sign In</button>
+      </form>
+      <div class="auth-switch">
+        <span id="authSwitchText">Don't have an account?</span>
+        <button id="authSwitchBtn">Create one</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <rect x="2" y="2" width="24" height="24" rx="4" stroke="currentColor" stroke-width="2"/>
+          <line x1="7" y1="8" x2="21" y2="8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <line x1="7" y1="13" x2="18" y2="13" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="7" y1="17" x2="20" y2="17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="7" y1="21" x2="15" y2="21" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        <span class="logo-text">ResumeForge</span>
+      </div>
+    </div>
+    <div class="header-center">
+      <!-- Resume selector -->
+      <div class="resume-selector" id="resumeSelector">
+        <select id="resumeSelect" class="resume-select"></select>
+        <button class="btn btn-small" id="newResumeBtn" title="New Resume">+</button>
+        <button class="btn btn-small btn-danger-small" id="deleteResumeBtn" title="Delete Resume">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <button class="template-toggle-btn" id="templateToggleBtn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="1" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="9" y="1" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="1" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="9" y="9" width="6" height="6" rx="1" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        Templates
+      </button>
+    </div>
+    <div class="header-right">
+      <span class="save-status" id="saveStatus"></span>
+      <button class="btn btn-primary" id="exportBtn">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M8 2v8M4 7l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M2 12v2h12v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Export PDF
+      </button>
+      <div class="user-menu" id="userMenu">
+        <button class="user-avatar" id="userAvatar" title="Account"></button>
+        <div class="user-dropdown" id="userDropdown">
+          <div class="user-dropdown-info" id="userDropdownInfo"></div>
+          <button class="user-dropdown-item" id="logoutBtn">Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Template Selector Drawer -->
+  <div class="template-drawer" id="templateDrawer">
+    <div class="template-drawer-inner">
+      <div class="template-grid" id="templateGrid"></div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <main class="app-main">
+    <!-- Editor Panel -->
+    <aside class="editor-panel" id="editorPanel">
+      <div class="editor-scroll" id="editorScroll"></div>
+    </aside>
+
+    <!-- Preview Panel -->
+    <section class="preview-panel" id="previewPanel">
+      <div class="preview-wrapper">
+        <div class="overflow-warning" id="overflowWarning"></div>
+        <div class="preview-page" id="previewPage"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Print-only resume -->
+  <div class="print-only" id="printContainer"></div>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
