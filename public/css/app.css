@@ -709,7 +709,7 @@ textarea.field-input {
   display: flex;
   flex-wrap: wrap;
   gap: 4px 16px;
-  font-size: 9.5pt;
+  font-size: 10.5pt;
 }
 
 .resume .entry {
@@ -723,7 +723,7 @@ textarea.field-input {
 .resume .entry-top {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: flex-start;
   flex-wrap: wrap;
   gap: 0 12px;
 }
@@ -731,6 +731,9 @@ textarea.field-input {
 .resume .entry-dates {
   white-space: nowrap;
   flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
 .resume .section {
@@ -818,6 +821,12 @@ textarea.field-input {
   font-style: italic;
 }
 
+.template-classic .entry-location {
+  font-size: 9.5pt;
+  color: #555;
+  font-style: italic;
+}
+
 .template-classic .summary-text {
   margin-top: 6px;
   font-size: 10pt;
@@ -869,7 +878,7 @@ textarea.field-input {
 .template-modern .contact-row {
   margin-top: 12px;
   color: rgba(255,255,255,0.7);
-  font-size: 9.5pt;
+  font-size: 10.5pt;
 }
 
 .template-modern .modern-body {
@@ -901,8 +910,14 @@ textarea.field-input {
 
 .template-modern .entry-dates {
   font-size: 9.5pt;
-  color: #666;
-  font-weight: 400;
+  color: #1e3a5f;
+  font-weight: 600;
+}
+
+.template-modern .entry-location {
+  font-size: 9pt;
+  color: #1e3a5f;
+  font-weight: 600;
 }
 
 .template-modern .summary-text {
@@ -945,7 +960,7 @@ textarea.field-input {
 .template-minimal .contact-row {
   margin-top: 10px;
   color: #888;
-  font-size: 9.5pt;
+  font-size: 10.5pt;
 }
 
 .template-minimal h2 {
@@ -974,8 +989,13 @@ textarea.field-input {
 }
 
 .template-minimal .entry-dates {
-  color: #aaa;
+  color: #888;
   font-size: 9.5pt;
+}
+
+.template-minimal .entry-location {
+  font-size: 9pt;
+  color: #888;
 }
 
 .template-minimal .entry {
@@ -1041,7 +1061,7 @@ textarea.field-input {
 
 .template-executive .exec-contact {
   text-align: right;
-  font-size: 9pt;
+  font-size: 10pt;
   color: rgba(255,255,255,0.7);
   line-height: 1.7;
   flex-shrink: 0;
@@ -1076,7 +1096,14 @@ textarea.field-input {
 
 .template-executive .entry-dates {
   font-size: 9.5pt;
-  color: #666;
+  color: #444;
+  font-weight: 600;
+}
+
+.template-executive .entry-location {
+  font-size: 9pt;
+  color: #444;
+  font-weight: 600;
 }
 
 .template-executive .summary-text {
@@ -1123,7 +1150,7 @@ textarea.field-input {
   justify-content: center;
   margin-top: 10px;
   color: #8b6f4e;
-  font-size: 9.5pt;
+  font-size: 10.5pt;
   letter-spacing: 0.02em;
 }
 
@@ -1163,6 +1190,12 @@ textarea.field-input {
 
 .template-elegant .entry-dates {
   font-size: 10pt;
+  color: #8b6f4e;
+  font-style: italic;
+}
+
+.template-elegant .entry-location {
+  font-size: 9.5pt;
   color: #8b6f4e;
   font-style: italic;
 }

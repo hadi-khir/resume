@@ -254,9 +254,11 @@ function renderSectionEntries(type, data) {
   if (type === 'experience') {
     return data.experience.map(function(e) {
       return '<div class="entry"><div class="entry-top"><div>' +
-        '<h3>' + esc(e.company) + (e.location ? ', ' + esc(e.location) : '') + '</h3>' +
+        '<h3>' + esc(e.company) + '</h3>' +
         '<div class="entry-sub">' + esc(e.position) + '</div>' +
-        '</div><div class="entry-dates">' + dateRange(e.startDate, e.endDate, e.current) + '</div></div>' +
+        '</div><div class="entry-dates">' + dateRange(e.startDate, e.endDate, e.current) +
+        (e.location ? '<div class="entry-location">' + esc(e.location) + '</div>' : '') +
+        '</div></div>' +
         bulletLines(e.description) + '</div>';
     }).join('');
   }
