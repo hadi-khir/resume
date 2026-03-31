@@ -1,0 +1,13 @@
+services:
+  resumeforge:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_PATH=/app/data/resumeforge.db
+      - SESSION_SECRET=${SESSION_SECRET}
