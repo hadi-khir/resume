@@ -1291,14 +1291,43 @@ textarea.field-input {
     flex-wrap: wrap !important;
   }
 
+  /* ATS fix: replace dark headers with white background + dark text so
+     ATS parsers don't skip white-colored text in the PDF */
   .print-only .modern-header {
     display: block !important;
+    background: #fff !important;
+    color: #1a1a1a !important;
+    border-bottom: 3px solid #1e3a5f !important;
+    padding-bottom: 16px !important;
+  }
+
+  .print-only .modern-header h1,
+  .print-only .modern-header .resume-title {
+    color: #1a1a1a !important;
+  }
+
+  .print-only .template-modern .contact-row {
+    color: #444 !important;
+  }
+
+  .print-only .template-modern .contact-sep {
+    color: #999 !important;
   }
 
   .print-only .exec-header {
     display: flex !important;
     justify-content: space-between !important;
     align-items: flex-end !important;
+    background: #fff !important;
+    color: #1a1a1a !important;
+    border-bottom: 3px solid #111827 !important;
+    padding-bottom: 16px !important;
+  }
+
+  .print-only .exec-header h1,
+  .print-only .exec-header .resume-title,
+  .print-only .exec-contact {
+    color: #1a1a1a !important;
   }
 
   /* Ensure bullets render */
