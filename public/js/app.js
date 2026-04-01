@@ -790,8 +790,29 @@ function initEvents() {
     }
   });
 
-  document.getElementById('exportBtn').addEventListener('click', function() {
-    window.print();
+  document.getElementById('exportBtn').addEventListener('click', async function() {
+    if (!state.currentResumeId) return;
+    var btn = this;
+    btn.disabled = true;
+    btn.querySelector('span') ? btn.querySelector('span').textContent = 'Generating...' : null;
+    try {
+      var res = await fetch('/api/resumes/' + state.currentResumeId + '/pdf');
+      if (!res.ok) throw new Error('PDF generation failed');
+      var blob = await res.blob();
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = (state.resumeList.find(function(r) { return r.id === state.currentResumeId; }) || {}).name || 'resume';
+      a.download += '.pdf';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert('Failed to export PDF: ' + err.message);
+    } finally {
+      btn.disabled = false;
+    }
   });
 
   document.getElementById('resumeSelect').addEventListener('change', async function(e) {

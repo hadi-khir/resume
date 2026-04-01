@@ -8,6 +8,7 @@ const path = require('path');
 const crypto = require('crypto');
 const db = require('./db');
 const { requireAuth } = require('./middleware/auth');
+const { generatePDF, closeBrowser } = require('./pdf');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -236,6 +237,26 @@ async function startServer() {
     res.json({ ok: true });
   });
 
+  app.get('/api/resumes/:id/pdf', requireAuth, async function(req, res) {
+    try {
+      var resume = db.getResume(parseInt(req.params.id), req.session.userId);
+      if (!resume) {
+        return res.status(404).json({ error: 'Resume not found' });
+      }
+      var pdfBuffer = await generatePDF(resume.template, resume.data);
+      var filename = (resume.name || 'resume').replace(/[^a-zA-Z0-9_\- ]/g, '') + '.pdf';
+      res.set({
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': 'attachment; filename="' + filename + '"',
+        'Content-Length': pdfBuffer.length
+      });
+      res.send(pdfBuffer);
+    } catch (err) {
+      console.error('PDF generation error:', err);
+      res.status(500).json({ error: 'Failed to generate PDF' });
+    }
+  });
+
   app.delete('/api/resumes/:id', requireAuth, function(req, res) {
     var deleted = db.deleteResume(parseInt(req.params.id), req.session.userId);
     if (!deleted) {
@@ -262,6 +283,7 @@ startServer().catch(function(err) {
 
 // Graceful shutdown
 process.on('SIGTERM', function() {
+  closeBrowser();
   db.close();
   process.exit(0);
 });
