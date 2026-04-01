@@ -250,7 +250,7 @@ async function startServer() {
         'Content-Disposition': 'attachment; filename="' + filename + '"',
         'Content-Length': pdfBuffer.length
       });
-      res.send(pdfBuffer);
+      res.send(Buffer.from(pdfBuffer));
     } catch (err) {
       console.error('PDF generation error:', err);
       res.status(500).json({ error: 'Failed to generate PDF' });

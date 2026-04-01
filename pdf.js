@@ -4,14 +4,32 @@ const path = require('path');
 
 let browser = null;
 
-// Read the app CSS once at startup, extract only the resume template styles
+// Read the app CSS once at startup
 const fullCSS = fs.readFileSync(path.join(__dirname, 'public', 'css', 'app.css'), 'utf8');
+
+// System font overrides for PDF — Google Fonts aren't available in Docker,
+// so we map to system/liberation fonts that are installed in the container
+const fontOverrides = `
+  .template-classic { font-family: 'Liberation Serif', Georgia, 'Times New Roman', serif !important; }
+  .template-modern { font-family: 'Liberation Sans', 'Segoe UI', Calibri, sans-serif !important; }
+  .template-minimal { font-family: 'Liberation Sans', 'Helvetica Neue', Arial, sans-serif !important; }
+  .template-executive { font-family: 'Liberation Sans', Calibri, 'Segoe UI', sans-serif !important; }
+  .template-elegant { font-family: 'Liberation Serif', Georgia, serif !important; }
+  .template-classic h2 { font-family: 'Liberation Sans', sans-serif !important; }
+  .template-elegant h2 { font-family: 'Liberation Sans', sans-serif !important; }
+`;
 
 async function getBrowser() {
   if (!browser || !browser.connected) {
     var opts = {
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu']
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-gpu',
+        '--disable-dev-shm-usage',
+        '--font-render-hinting=none'
+      ]
     };
     if (process.env.PUPPETEER_EXECUTABLE_PATH) {
       opts.executablePath = process.env.PUPPETEER_EXECUTABLE_PATH;
@@ -193,27 +211,38 @@ async function generatePDF(template, data) {
   var b = await getBrowser();
   var page = await b.newPage();
 
+  // Set viewport to letter-width (8.5in at 96dpi)
+  await page.setViewport({ width: 816, height: 1056 });
+
   var resumeHTML = buildResumeHTML(template, data);
 
+  // Build a self-contained HTML page with no external dependencies
   var html = '<!DOCTYPE html><html><head><meta charset="UTF-8">' +
-    '<link rel="preconnect" href="https://fonts.googleapis.com">' +
-    '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' +
-    '<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Source+Sans+3:wght@300;400;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">' +
-    '<style>' + fullCSS + '\n' +
+    '<style>' +
     '*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }' +
     'body { margin: 0; padding: 0; background: #fff; }' +
+    fullCSS + '\n' +
+    fontOverrides +
     '</style></head><body>' + resumeHTML + '</body></html>';
 
-  await page.setContent(html, { waitUntil: 'networkidle0' });
+  // Write to temp file and navigate to it — more reliable than setContent
+  var tmpFile = path.join(require('os').tmpdir(), 'resume-' + Date.now() + '.html');
+  fs.writeFileSync(tmpFile, html);
 
-  var pdfBuffer = await page.pdf({
-    format: 'Letter',
-    printBackground: true,
-    margin: { top: 0, right: 0, bottom: 0, left: 0 }
-  });
+  try {
+    await page.goto('file://' + tmpFile, { waitUntil: 'load', timeout: 10000 });
 
-  await page.close();
-  return pdfBuffer;
+    var pdfBuffer = await page.pdf({
+      format: 'Letter',
+      printBackground: true,
+      margin: { top: 0, right: 0, bottom: 0, left: 0 }
+    });
+
+    return pdfBuffer;
+  } finally {
+    await page.close();
+    try { fs.unlinkSync(tmpFile); } catch (_) {}
+  }
 }
 
 function closeBrowser() {
